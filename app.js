@@ -19,7 +19,7 @@ app.use(express.static('public'))
 // Activate HTTP server
 const httpServer = app.listen(port, appListen)
 //console.log(httpServer);
-async function appListen () {
+function appListen () {
   console.log(`Listening for HTTP queries on: http://localhost:${port}`)
 }
 
