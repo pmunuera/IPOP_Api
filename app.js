@@ -96,12 +96,11 @@ async function setRecord (req, res) {
   if (receivedPOST) {
     const cont = await db.query("select count(*) as cont from Cicles where nom='"+receivedPOST.cicle+"'");
     if(cont[0]["cont"]>0){
-      // const id = await db.query("select id from Families_Professionals where nom='"+receivedPOST.nom+"'");
-      // const ciclos = await db.query("select nom from Cicles where id_familia_professional="+id[0]["id"]+"");
-      // const nombreCiclos = ciclos.map(item => item.nom);
-      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades) values('"+ receivedPOST.alies+"','"+ receivedPOST.name+"', 18, '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", '"+receivedPOST.errades+"');");
+      const id = await db.query("select id from Cicles where nom='"+receivedPOST.cicle+"'");
+      let puntuacion=receivedPOST.encerts-receivedPOST.errades;
+      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+");");
 
-      result = {status: "OK", message: "Si existeix el cicle"}
+      result = {status: "OK", message: "S'ha afegit el record"}
     }else{
       result = {status: "ERROR", message: "No existeix el cicle indicat"}
     }
