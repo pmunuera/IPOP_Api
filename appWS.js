@@ -27,24 +27,22 @@ class Obj {
 
     // A websocket client connects
     newConnection (ws) {
-        if(jugadors<2){
-            console.log("Client connected")
-            // Add client to the clients list
-            const id = uuidv4()
-            const color = Math.floor(Math.random() * 360)
-            const metadata = { id, color,jugadors }
-            this.socketsClients.set(ws, metadata)
+        console.log("Client connected")
+        // Add client to the clients list
+        const id = uuidv4()
+        const color = Math.floor(Math.random() * 360)
+        const metadata = { id, color,jugadors }
+        this.socketsClients.set(ws, metadata)
             
-            // Send clients list to everyone
-            this.sendClients()
-            // What to do when a client is disconnected
-            ws.on("close", () => { 
-                this.socketsClients.delete(ws)
-            })
+        // Send clients list to everyone
+        this.sendClients()
+        // What to do when a client is disconnected
+        ws.on("close", () => { 
+            this.socketsClients.delete(ws)
+        })
 
-            // What to do when a client message is received
-            ws.on('message', (bufferedMessage) => { this.newMessage(ws, id, bufferedMessage)})
-        }
+        // What to do when a client message is received
+        ws.on('message', (bufferedMessage) => { this.newMessage(ws, id, bufferedMessage)})
     }
 
     // Send clientsIds to everyone connected with websockets
