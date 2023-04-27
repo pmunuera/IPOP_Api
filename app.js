@@ -1,10 +1,10 @@
-
+const express     = require('express')
 const fs          = require('fs').promises
 
-const webSockets  = require('./appWS.js')
 const post        = require('./utilsPost.js')
 const database    = require('./utilsMySQL.js')
 const wait        = require('./utilsWait.js')
+const webSockets  = require('./utilsWebSockets.js')
 
 var db = new database()   // Database example: await db.query("SELECT * FROM test")
 var ws = new webSockets()
@@ -18,7 +18,6 @@ app.use(express.static('public'))
 
 // Activate HTTP server
 const httpServer = app.listen(port, appListen)
-//console.log(httpServer);
 function appListen () {
   console.log(`Listening for HTTP queries on: http://localhost:${port}`)
 }
@@ -42,8 +41,29 @@ db.init({
   password: process.env.MYSQLPASSWORD || "2nhSo0brHkHt78S9xV12",
   database: process.env.MYSQLDATABASE || "railway"
 })
-ws.init(httpServer, port, db)
 
+ws.init(httpServer, port) 
+ws.onConnection = (socket, id) => {
+  // Aquest mètode es crida quan hi ha una nova connexió WebSocket
+  console.log("WebSocket client connected")
+}
+ws.onMessage = (socket, id, obj) => {
+  // Aquest mètode es crida quan es rep un missatge per WebSocket
+  if (obj.type == "bounce") {
+    var rst = { type: "bounce", message: obj.message }
+    socket.send(JSON.stringify(rst))
+  
+  } else if (obj.type == "broadcast") {
+  
+    var rst = { type: "broadcast", origin: id, message: obj.message }
+    ws.broadcast(rst)
+  
+  } else if (obj.type == "private") {
+  
+    var rst = { type: "private", origin: id, destination: obj.destination, message: obj.message }
+    ws.private(rst)
+  }
+}
 
 // Define routes
 app.post('/get_families_professionals', getFamilies)
