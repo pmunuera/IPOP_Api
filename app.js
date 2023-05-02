@@ -149,12 +149,42 @@ async function getRanking(req,res){
   let ranking = [];
   if(receivedPOST){
     if(receivedPOST.limitElements<=20){
-      ranking = await db.query("SELECT * FROM Ranking ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", "+receivedPOST.limitElements+";")
+      ranking = await db.query("SELECT * FROM Ranking WHERE visible=1 ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", "+receivedPOST.limitElements+";")
     }
     else if(receivedPOST.limitElements>20){
-      ranking = await db.query("SELECT * FROM Ranking ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", 20;")
+      ranking = await db.query("SELECT * FROM Ranking WHERE visible=1 ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", 20;")
     }
-    result = {status: "OK",ranking:ranking}
+    result = {status: "OK", message: "El ranking", ranking: ranking}
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(result))
+}
+
+app.post('/get_all_rankings',getAllRanking)
+async function getAllRanking(req,res){
+  let receivedPOST = await post.getPostObject(req)
+  let result = { status: "ERROR", message: "Unkown type" }
+  if(receivedPOST){
+    let ranking = await db.query("SELECT * FROM Ranking;")
+
+    result = {status: "OK", message: "Totes les dades del ranking", ranking: ranking}
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(result))
+}
+
+app.post('/update_visible',updateVisible)
+async function updateVisible(req,res){
+  let receivedPOST = await post.getPostObject(req)
+  let result = { status: "ERROR", message: "Unkown type" }
+  if(receivedPOST){
+    if (receivedPOST.visible=="Si"){
+      await db.query("UPDATE Ranking SET visible=1 where id="+receivedPOST.id+";")
+    }else if(receivedPOST.visible=="No"){
+      await db.query("UPDATE Ranking SET visible=0 where id="+receivedPOST.id+";")
+    }
+
+    result = {status: "OK", message: "Visibilitat modificada correctament"}
   }
   res.writeHead(200, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify(result))
