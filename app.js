@@ -16,6 +16,8 @@ const port = process.env.PORT || 3000
 // Publish static files from 'public' folder
 app.use(express.static('public'))
 
+let result = {}
+
 // Activate HTTP server
 const httpServer = app.listen(port, appListen)
 function appListen () {
@@ -47,7 +49,7 @@ ws.onConnection = (socket, id) => {
   // Aquest mètode es crida quan hi ha una nova connexió WebSocket
   console.log("WebSocket client connected")
 }
-ws.onMessage = (socket, id, obj) => {
+ws.onMessage = async (socket, id, obj) => {
   // Aquest mètode es crida quan es rep un missatge per WebSocket
   if (obj.type == "bounce") {
     var rst = { type: "bounce", message: obj.message }
@@ -63,6 +65,40 @@ ws.onMessage = (socket, id, obj) => {
     var rst = { type: "private", origin: id, destination: obj.destination, message: obj.message }
     ws.private(rst)
   }
+  else if (obj.type=="newUser"){
+    if(ws.socketsClients.size==1){
+        let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
+        let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
+        for (let i = 0; i < 5; i++){
+            let num = Math.floor(Math.random()*nombreTotemsDisponibles)
+            ws.llistaTotems.push(totemsDisponibles[num].nom)
+        }
+        let totemsFalsos = await db.query("select nom from Ocupacions where id_cicle!=(select id from Cicles where nom='"+obj.cicle+"')");
+        let nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
+        for (let i = 0; i < 5; i++){
+            let num1 = Math.floor(Math.random()*nombreTotemsFalsos)
+            ws.llistaTotems.push(totemsDisponibles[num1].nom)
+        }
+    }
+    else{
+        let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
+        let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
+        for (let i = 0; i < 5; i++){
+            let num = Math.floor(Math.random()*nombreTotemsDisponibles)
+            ws.llistaTotems.push(totemsDisponibles[num].nom)
+        }
+    }
+    ws.wss.clients.forEach(async (client) => {
+        if (ws.socketsClients.get(client).id == obj.idClient && client.readyState === WebSocket.OPEN) {
+            var ip = ws.socketsClients.get(client).ip
+            let newClient = {ip: ip,nom:obj.nom,cicle:obj.cicle}
+            ws.llistaClients.push(newClient)
+            await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+","+obj.cicle+","+ip+",1);");
+        }
+    })
+    result={status:"OK",totems:ws.llistaTotems}
+    ws.broadcast(result)
+}
 }
 
 // Define routes

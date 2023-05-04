@@ -2,7 +2,9 @@
 
 const WebSocket = require('ws')
 const { v4: uuidv4 } = require('uuid')
-
+let result = {}
+let llistaTotems = []
+let llistaClients = []
 class Obj {
 
     init (httpServer, port) {      
@@ -15,7 +17,9 @@ class Obj {
         this.wss = new WebSocket.Server({ server: httpServer })
         this.socketsClients = new Map()
         console.log(`Listening for WebSocket queries on ${port}`)
-
+        this.numTotems=0
+        this.llistaTotems = []
+        this.llistaClients = []
         // What to do when a websocket client connects
         this.wss.on('connection', (ws) => { this.newConnection(ws) })
     }
@@ -28,21 +32,30 @@ class Obj {
     newConnection (ws) {
 
         console.log("Client connected")
-
         // Add client to the clients list
         const id = uuidv4()
         const color = Math.floor(Math.random() * 360)
-        const metadata = { id, color }
+        var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+        const metadata = { id, color,ip }
         this.socketsClients.set(ws, metadata)
-
+        
+        if(this.socketsClients.size==1){
+            numTotems=numTotems+10
+        }
+        else{
+            numTotems=numTotems+5
+        }
+        this.broadcast(numTotems)
         // Send clients list to everyone
         this.sendClients()
-        if (this.onConnection && typeof this.onConnection === "function") {
-            this.onConnection(ws, id)
-        }
-
         // What to do when a client is disconnected
-        ws.on("close", () => { this.socketsClients.delete(ws)  })
+        ws.on("close", () => { 
+            if(this.socketsClients.size==1){
+                numTotems=0
+                llistaTotems={}
+            }
+            this.socketsClients.delete(ws)
+        })
 
         // What to do when a client message is received
         ws.on('message', (bufferedMessage) => { this.newMessage(ws, id, bufferedMessage)})
