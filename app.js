@@ -131,7 +131,7 @@ async function setRecord (req, res) {
       if(puntuacion<0){
         puntuacion=0;
       }
-      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+");");
+      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades, visible, ip_jugador, dispositiu) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+", 1, '"+receivedPOST.ip+"','"+receivedPOST.dispositiu+"');");
 
       result = {status: "OK", message: "S'ha afegit el record"}
     }else{
@@ -185,6 +185,23 @@ async function updateVisible(req,res){
     }
 
     result = {status: "OK", message: "Visibilitat modificada correctament"}
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(result))
+}
+
+app.post('/totems',totems)
+async function totems(req,res){
+  let receivedPOST = await post.getPostObject(req)
+  let result = { status: "ERROR", message: "Unkown type" }
+  if(receivedPOST){
+    let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+receivedPOST.cicle+"')");
+    const nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
+
+    let totemsFalsos = await db.query("select nom from Ocupacions where id_cicle!=(select id from Cicles where nom='"+receivedPOST.cicle+"')");
+    const nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
+
+    result = {status: "OK", message: "Totems", correctos: nombreTotemsDisponibles, falsos: nombreTotemsFalsos}
   }
   res.writeHead(200, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify(result))
