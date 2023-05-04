@@ -142,6 +142,7 @@ async function setRecord (req, res) {
   res.writeHead(200, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify(result))
 }
+
 app.post('/get_ranking',getRanking)
 async function getRanking(req,res){
   let receivedPOST = await post.getPostObject(req)
@@ -166,6 +167,11 @@ async function getAllRanking(req,res){
   let result = { status: "ERROR", message: "Unkown type" }
   if(receivedPOST){
     let ranking = await db.query("SELECT * FROM Ranking;")
+
+    for (let jugador of ranking) {
+      let nomCicle = await db.query("SELECT nom FROM Cicles where id="+jugador.cicle+";")
+      jugador.cicle = nomCicle[0]["nom"];
+    }
 
     result = {status: "OK", message: "Totes les dades del ranking", ranking: ranking}
   }
