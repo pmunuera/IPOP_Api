@@ -5,6 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 const { log } = require('forever');
 const wait = require('./utilsWait.js')
 let result = {}
+let llistaTotems = {}
+let numTotems = 0
 class Obj {
 
     init (httpServer, port, db) {
@@ -31,13 +33,24 @@ class Obj {
         // Add client to the clients list
         const id = uuidv4()
         const color = Math.floor(Math.random() * 360)
-        const metadata = { id, color,jugadors }
+        var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+        const metadata = { id, color,ip }
         this.socketsClients.set(ws, metadata)
-            
+        
+        if(this.socketsClients.size==1){
+            numTotems=numTotems+10
+        }
+        else{
+            numTotems=numTotems+5
+        }
+        this.broadcast(numTotems)
         // Send clients list to everyone
         this.sendClients()
         // What to do when a client is disconnected
         ws.on("close", () => { 
+            if(this.socketsClients.size==1){
+                numTotems=0
+            }
             this.socketsClients.delete(ws)
         })
 
@@ -102,6 +115,11 @@ class Obj {
 
             var rst = { type: "private", origin: id, destination: messageAsObject.destination, message: messageAsObject.message }
             this.private(rst)
+        }
+        else if (messageAsObject.type=="getTotems"){
+            if(this.socketsClients.size==1){
+
+            }
         }
     }
     
