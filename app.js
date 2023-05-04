@@ -131,7 +131,7 @@ async function setRecord (req, res) {
       if(puntuacion<0){
         puntuacion=0;
       }
-      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+");");
+      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades, visible, ip_jugador, dispositiu) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+", 1, '"+receivedPOST.ip+"','"+receivedPOST.dispositiu+"');");
 
       result = {status: "OK", message: "S'ha afegit el record"}
     }else{
@@ -149,12 +149,59 @@ async function getRanking(req,res){
   let ranking = [];
   if(receivedPOST){
     if(receivedPOST.limitElements<=20){
-      ranking = await db.query("SELECT * FROM Ranking ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", "+receivedPOST.limitElements+";")
+      ranking = await db.query("SELECT * FROM Ranking WHERE visible=1 ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", "+receivedPOST.limitElements+";")
     }
     else if(receivedPOST.limitElements>20){
-      ranking = await db.query("SELECT * FROM Ranking ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", 20;")
+      ranking = await db.query("SELECT * FROM Ranking WHERE visible=1 ORDER BY Puntuacio desc LIMIT "+receivedPOST.limitInici+", 20;")
     }
-    result = {status: "OK",ranking:ranking}
+    result = {status: "OK", message: "El ranking", ranking: ranking}
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(result))
+}
+
+app.post('/get_all_rankings',getAllRanking)
+async function getAllRanking(req,res){
+  let receivedPOST = await post.getPostObject(req)
+  let result = { status: "ERROR", message: "Unkown type" }
+  if(receivedPOST){
+    let ranking = await db.query("SELECT * FROM Ranking;")
+
+    result = {status: "OK", message: "Totes les dades del ranking", ranking: ranking}
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(result))
+}
+
+app.post('/update_visible',updateVisible)
+async function updateVisible(req,res){
+  let receivedPOST = await post.getPostObject(req)
+  let result = { status: "ERROR", message: "Unkown type" }
+  if(receivedPOST){
+    if (receivedPOST.visible=="Si"){
+      await db.query("UPDATE Ranking SET visible=1 where id="+receivedPOST.id+";")
+    }else if(receivedPOST.visible=="No"){
+      await db.query("UPDATE Ranking SET visible=0 where id="+receivedPOST.id+";")
+    }
+
+    result = {status: "OK", message: "Visibilitat modificada correctament"}
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(result))
+}
+
+app.post('/totems',totems)
+async function totems(req,res){
+  let receivedPOST = await post.getPostObject(req)
+  let result = { status: "ERROR", message: "Unkown type" }
+  if(receivedPOST){
+    let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+receivedPOST.cicle+"')");
+    const nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
+
+    let totemsFalsos = await db.query("select nom from Ocupacions where id_cicle!=(select id from Cicles where nom='"+receivedPOST.cicle+"')");
+    const nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
+
+    result = {status: "OK", message: "Totems", correctos: nombreTotemsDisponibles, falsos: nombreTotemsFalsos}
   }
   res.writeHead(200, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify(result))
