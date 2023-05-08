@@ -2,6 +2,10 @@
 
 const WebSocket = require('ws')
 const { v4: uuidv4 } = require('uuid')
+const database    = require('./utilsMySQL.js')
+const wait        = require('./utilsWait.js')
+
+var db = new database() 
 let result = {}
 let llistaTotems = []
 let llistaClients = []
@@ -17,9 +21,15 @@ class Obj {
         this.wss = new WebSocket.Server({ server: httpServer })
         this.socketsClients = new Map()
         console.log(`Listening for WebSocket queries on ${port}`)
+        db.init({
+            host: process.env.MYSQLHOST || "containers-us-west-128.railway.app",
+            port: process.env.MYSQLPORT || 7219,
+            user: process.env.MYSQLUSER || "root",
+            password: process.env.MYSQLPASSWORD || "bdUIwVmp53UvoEx5he6j",
+            database: process.env.MYSQLDATABASE || "railway"
+          })
         this.numTotems=0
         this.llistaTotems = []
-        this.llistaClients = []
         // What to do when a websocket client connects
         this.wss.on('connection', (ws) => { this.newConnection(ws) })
     }
@@ -35,25 +45,34 @@ class Obj {
         // Add client to the clients list
         const id = uuidv4()
         const color = Math.floor(Math.random() * 360)
-        var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-        const metadata = { id, color,ip }
+        const metadata = { id, color}
+        this.ip=ws._socket.remoteAddress
+        this.users = []
         this.socketsClients.set(ws, metadata)
         
         if(this.socketsClients.size==1){
-            numTotems=numTotems+10
+            this.numTotems=this.numTotems+10
         }
         else{
-            numTotems=numTotems+5
+            this.numTotems=this.numTotems+5
         }
-        this.broadcast(numTotems)
         // Send clients list to everyone
         this.sendClients()
         // What to do when a client is disconnected
-        ws.on("close", () => { 
+        ws.on("close", async () => { 
             if(this.socketsClients.size==1){
-                numTotems=0
+                this.numTotems=0
                 llistaTotems={}
             }
+            console.log(this.users);
+            await Promise.all(
+                this.users.map(async (user)=> {
+                console.log(user);
+                if (this.socketsClients.get(ws).id == user.id) {
+                    console.log(user.nom);
+                    await db.query("INSERT INTO Connexions(nom,cicle,ip,connexio) VALUES('"+user.nom+"','"+user.cicle+"','"+this.ip+"',0);")
+                }
+            }))
             this.socketsClients.delete(ws)
         })
 

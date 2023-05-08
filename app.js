@@ -1,10 +1,11 @@
 const express     = require('express')
 const fs          = require('fs').promises
-
+const WebSocket = require('ws')
 const post        = require('./utilsPost.js')
 const database    = require('./utilsMySQL.js')
 const wait        = require('./utilsWait.js')
 const webSockets  = require('./utilsWebSockets.js')
+const { log } = require('console')
 
 var db = new database()   // Database example: await db.query("SELECT * FROM test")
 var ws = new webSockets()
@@ -37,10 +38,10 @@ function shutDown() {
 
 // Init objects
 db.init({
-  host: process.env.MYSQLHOST || "containers-us-west-168.railway.app",
-  port: process.env.MYSQLPORT || 5657,
+  host: process.env.MYSQLHOST || "containers-us-west-128.railway.app",
+  port: process.env.MYSQLPORT || 7219,
   user: process.env.MYSQLUSER || "root",
-  password: process.env.MYSQLPASSWORD || "2nhSo0brHkHt78S9xV12",
+  password: process.env.MYSQLPASSWORD || "bdUIwVmp53UvoEx5he6j",
   database: process.env.MYSQLDATABASE || "railway"
 })
 
@@ -70,33 +71,31 @@ ws.onMessage = async (socket, id, obj) => {
         let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
         for (let i = 0; i < 5; i++){
-            let num = Math.floor(Math.random()*nombreTotemsDisponibles)
+            let num = Math.floor(Math.random()*nombreTotemsDisponibles.length)
             ws.llistaTotems.push(totemsDisponibles[num].nom)
         }
         let totemsFalsos = await db.query("select nom from Ocupacions where id_cicle!=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
         for (let i = 0; i < 5; i++){
-            let num1 = Math.floor(Math.random()*nombreTotemsFalsos)
-            ws.llistaTotems.push(totemsDisponibles[num1].nom)
+            let num1 = Math.floor(Math.random()*nombreTotemsFalsos.length)
+            ws.llistaTotems.push(totemsFalsos[num1].nom)
         }
     }
     else{
         let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
         for (let i = 0; i < 5; i++){
-            let num = Math.floor(Math.random()*nombreTotemsDisponibles)
+            let num = Math.floor(Math.random()*nombreTotemsDisponibles.length)
             ws.llistaTotems.push(totemsDisponibles[num].nom)
         }
     }
     ws.wss.clients.forEach(async (client) => {
         if (ws.socketsClients.get(client).id == obj.idClient && client.readyState === WebSocket.OPEN) {
-            var ip = ws.socketsClients.get(client).ip
-            let newClient = {ip: ip,nom:obj.nom,cicle:obj.cicle}
-            ws.llistaClients.push(newClient)
-            await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+","+obj.cicle+","+ip+",1);");
+            ws.users.push({id: obj.idClient, nom: obj.nom,cicle:obj.cicle})
+            await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+"','"+obj.cicle+"','"+ws.ip+"',1);");
         }
     })
-    result={status:"OK",totems:ws.llistaTotems}
+    result={status:"OK",type:"newClient",totems:ws.llistaTotems}
     ws.broadcast(result)
 }
 }
