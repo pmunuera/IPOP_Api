@@ -166,7 +166,7 @@ async function setRecord (req, res) {
       if(puntuacion<0){
         puntuacion=0;
       }
-      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades, visible, ip_jugador, dispositiu) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+", 1, '"+receivedPOST.ip+"','"+receivedPOST.dispositiu+"');");
+      await db.query("insert into Ranking(alies,cicle, puntuacio, temps, encerts, errades, visible, ip_jugador, dispositiu) values('"+ receivedPOST.alies+"',"+ id[0]["id"]+", "+puntuacion+", '"+ receivedPOST.temps +"', "+ receivedPOST.encerts +", "+receivedPOST.errades+", 1, '"+req.socket.remoteAddress+"','"+receivedPOST.dispositiu+"');");
 
       result = {status: "OK", message: "S'ha afegit el record"}
     }else{
