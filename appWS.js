@@ -46,6 +46,7 @@ class Obj {
         else{
             numTotems=numTotems+5
         }
+        ws.send('paella')
         this.broadcast(numTotems)
         // Send clients list to everyone
         this.sendClients()
