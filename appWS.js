@@ -32,7 +32,7 @@ class Obj {
     end () {
         this.wss.close()
     }
-
+ 
     // A websocket client connects
     newConnection (ws) {
         console.log("Client connected")
