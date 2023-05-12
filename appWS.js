@@ -24,7 +24,6 @@ class Obj {
 
         // What to do when a websocket client connects
         this.wss.on('connection', (ws) => { 
-            ws.send('paella')
             this.newConnection(ws) 
         })
 
@@ -37,6 +36,7 @@ class Obj {
     // A websocket client connects
     newConnection (ws) {
         console.log("Client connected")
+        ws.send('algo')
         // Add client to the clients list
         const id = uuidv4()
         const color = Math.floor(Math.random() * 360)
