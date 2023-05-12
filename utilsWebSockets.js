@@ -22,14 +22,14 @@ class Obj {
         this.socketsClients = new Map()
         console.log(`Listening for WebSocket queries on ${port}`)
         db.init({
-            host: process.env.MYSQLHOST || "containers-us-west-128.railway.app",
-            port: process.env.MYSQLPORT || 7219,
+            host: process.env.MYSQLHOST || "containers-us-west-186.railway.app",
+            port: process.env.MYSQLPORT || 5617,
             user: process.env.MYSQLUSER || "root",
-            password: process.env.MYSQLPASSWORD || "bdUIwVmp53UvoEx5he6j",
+            password: process.env.MYSQLPASSWORD || "PubfEcTuGwZJ3sADED8K",
             database: process.env.MYSQLDATABASE || "railway"
           })
         this.numTotems=0
-        this.llistaTotems = []
+        this.llistaTotems = new Map()
         // What to do when a websocket client connects
         this.wss.on('connection', (ws) => { this.newConnection(ws) })
     }
@@ -65,13 +65,14 @@ class Obj {
                 llistaTotems={}
             }
             console.log(this.users);
+            var count=0
             await Promise.all(
                 this.users.map(async (user)=> {
-                console.log(user);
                 if (this.socketsClients.get(ws).id == user.id) {
-                    console.log(user.nom);
+                    this.users.slice(count,1)
                     await db.query("INSERT INTO Connexions(nom,cicle,ip,connexio) VALUES('"+user.nom+"','"+user.cicle+"','"+this.ip+"',0);")
                 }
+                count+=1
             }))
             this.socketsClients.delete(ws)
         })
