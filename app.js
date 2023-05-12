@@ -49,7 +49,7 @@ ws.init(httpServer, port)
 ws.onConnection = (socket, id) => {
   // Aquest mètode es crida quan hi ha una nova connexió WebSocket
   console.log("WebSocket client connected")
-  ws.send('paella')
+  socket.send('paella')
 }
 ws.onMessage = async (socket, id, obj) => {
   // Aquest mètode es crida quan es rep un missatge per WebSocket
