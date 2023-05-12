@@ -23,12 +23,11 @@ class Obj {
         console.log(`Listening for WebSocket queries on ${port}`)
 
         // What to do when a websocket client connects
-        this.wss.on('connection', (ws) => { this.newConnection(ws) })
+        this.wss.on('connection', (ws) => { 
+            ws.send('paella')
+            this.newConnection(ws) 
+        })
 
-        this.wss.on('greet', function(data) {
-            console.log(data);
-            this.wss.emit('respond', { hello: 'Hey!' });
-          });
     }
 
     end () {
@@ -51,7 +50,6 @@ class Obj {
         else{
             numTotems=numTotems+5
         }
-        ws.send('paella')
         this.broadcast(numTotems)
         // Send clients list to everyone
         this.sendClients()
