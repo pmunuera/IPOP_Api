@@ -15,7 +15,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 // Publish static files from 'public' folder
-app.use(express.static('public'))
+//app.use(express.static('public'))
 
 let result = {}
 

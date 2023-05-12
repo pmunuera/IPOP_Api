@@ -23,16 +23,20 @@ class Obj {
         console.log(`Listening for WebSocket queries on ${port}`)
 
         // What to do when a websocket client connects
-        this.wss.on('connection', (ws) => { this.newConnection(ws) })
+        this.wss.on('connection', (ws) => { 
+            this.newConnection(ws) 
+        })
+
     }
 
     end () {
         this.wss.close()
     }
-
+ 
     // A websocket client connects
     newConnection (ws) {
         console.log("Client connected")
+        ws.send('algo')
         // Add client to the clients list
         const id = uuidv4()
         const color = Math.floor(Math.random() * 360)
