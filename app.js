@@ -73,8 +73,8 @@ ws.onMessage = async (socket, id, obj) => {
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
         for (let i = 0; i < 5; i++){
             let num = Math.floor(Math.random()*nombreTotemsDisponibles.length)
-            let x1 = Math.floor(Math.random()*800)
-            let y1 = Math.floor(Math.random()*480)
+            let x1 = Math.floor(Math.random()*768)
+            let y1 = Math.floor(Math.random()*768)
             var totem1 = {nom: totemsDisponibles[num].nom,x:x1,y:y1}
             ws.llistaTotems.set(ws.llistaTotems.size,totem1)
         }
@@ -82,8 +82,8 @@ ws.onMessage = async (socket, id, obj) => {
         let nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
         for (let i = 0; i < 5; i++){
             let num1 = Math.floor(Math.random()*nombreTotemsFalsos.length)
-            let x2 = Math.floor(Math.random()*800)
-            let y2 = Math.floor(Math.random()*480)
+            let x2 = Math.floor(Math.random()*768)
+            let y2 = Math.floor(Math.random()*768)
             var totem2 = {nom: totemsFalsos[num1].nom,x:x2,y:y2}
             ws.llistaTotems.set(ws.llistaTotems.size,totem2)
         }
@@ -93,16 +93,16 @@ ws.onMessage = async (socket, id, obj) => {
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
         for (let i = 0; i < 5; i++){
             let num = Math.floor(Math.random()*nombreTotemsDisponibles.length)
-            let x = Math.floor(Math.random()*800)
-            let y = Math.floor(Math.random()*480)
+            let x = Math.floor(Math.random()*768)
+            let y = Math.floor(Math.random()*768)
             var totem3 = {nom: totemsDisponibles[num].nom,x:x,y:y}
             ws.llistaTotems.set(ws.llistaTotems.size,totem3)
         }
     }
     ws.wss.clients.forEach(async (client) => {
         if (ws.socketsClients.get(client).id == obj.idClient && client.readyState === WebSocket.OPEN) {
-            let x = Math.floor(Math.random()*800)
-            let y = Math.floor(Math.random()*480)
+            let x = Math.floor(Math.random()*768)
+            let y = Math.floor(Math.random()*768)
             ws.users.push({id: obj.idClient, nom: obj.nom,cicle:obj.cicle,x:x,y:y})
             await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+"','"+obj.cicle+"','"+ws.ip+"',1);");
         }
