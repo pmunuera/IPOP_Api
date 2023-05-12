@@ -24,6 +24,11 @@ class Obj {
 
         // What to do when a websocket client connects
         this.wss.on('connection', (ws) => { this.newConnection(ws) })
+
+        this.wss.on('greet', function(data) {
+            console.log(data);
+            this.wss.emit('respond', { hello: 'Hey!' });
+          });
     }
 
     end () {
