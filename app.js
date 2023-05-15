@@ -138,8 +138,8 @@ ws.onMessage = async (socket, id, obj) => {
   ws.broadcast(positions)
   }
   else if(obj.type=="remove_totem"){
-    
-    if(ws.llistaTotems!=null){
+    ws.llistaTotems.delete(obj.idTotem)
+    if(ws.llistaTotems.size!=0){
       const arrayDeMapa = Array.from(ws.llistaTotems);
 
       // Obtener el último elemento del array
@@ -151,7 +151,6 @@ ws.onMessage = async (socket, id, obj) => {
     else{
       var ultimaClave=0
     }
-    ws.llistaTotems.delete(obj.idTotem)
     result={status:"OK",type:"totemEliminat",totems:Object.fromEntries(ws.llistaTotems),ultimId:ultimaClave}
     ws.broadcast(result)
   }
