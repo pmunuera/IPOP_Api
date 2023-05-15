@@ -122,7 +122,7 @@ ws.onMessage = async (socket, id, obj) => {
     // Obtener la clave y el valor del último elemento
     const [ultimaClave, ultimoValor] = ultimoElemento;
 
-    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,utlimId:ultimaClave}
+    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,ultimId:ultimaClave}
     ws.broadcast(result)
   }
   else if(obj.type=="get_positions"){
@@ -147,7 +147,7 @@ ws.onMessage = async (socket, id, obj) => {
     // Obtener la clave y el valor del último elemento
     const [ultimaClave, ultimoValor] = ultimoElemento;
 
-    result={status:"OK",type:"totemEliminat",totems:Object.fromEntries(ws.llistaTotems),utlimId:ultimaClave}
+    result={status:"OK",type:"totemEliminat",totems:Object.fromEntries(ws.llistaTotems),ultimId:ultimaClave}
     ws.broadcast(result)
   }
 }
