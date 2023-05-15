@@ -81,13 +81,18 @@ ws.onMessage = async (socket, id, obj) => {
             ws.llistaTotems.set(ws.llistaTotems.size,totem1)
             totemsCorrectes.set(ws.llistaTotems.size,totem1)
         }
-        let totemsFalsos = await db.query("select nom from Ocupacions where id_cicle!=(select id from Cicles where nom='"+obj.cicle+"')");
-        let nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
+        let totemsFalsos = await db.query("select nom,id_cicle from Ocupacions where id_cicle!=(select id from Cicles where nom='"+obj.cicle+"')");
+        let nombreTotemsFalsos = totemsFalsos.map(item => {
+          return{nom:item.nom,cicle:item.id_cicle}
+        });
+        console.log(nombreTotemsFalsos);
         for (let i = 0; i < 5; i++){
             let num1 = Math.floor(Math.random()*nombreTotemsFalsos.length)
+            let ciclesFalsosT =  await db.query("select * FROM Cicles where id="+nombreTotemsFalsos[num1].cicle+";")
             let x2 = Math.floor(Math.random()*768)
             let y2 = Math.floor(Math.random()*768)
-            var totem2 = {nom: totemsFalsos[num1].nom,cicle: obj.cicle,x:x2,y:y2}
+            var totem2 = {nom: totemsFalsos[num1].nom,cicle: ciclesFalsosT[0].nom,x:x2,y:y2}
+            console.log("Totem 2: "+totem2);
             ws.llistaTotems.set(ws.llistaTotems.size,totem2)
             totemsIncorrectes.set(ws.llistaTotems.size,totem1)
         }
