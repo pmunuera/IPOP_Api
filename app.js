@@ -114,7 +114,15 @@ ws.onMessage = async (socket, id, obj) => {
             await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+"','"+obj.cicle+"','"+ws.ip+"',1);");
         }
     })
-    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users}
+    const arrayDeMapa = Array.from(ws.llistaTotems);
+
+    // Obtener el último elemento del array
+    const ultimoElemento = arrayDeMapa[arrayDeMapa.length - 1];
+
+    // Obtener la clave y el valor del último elemento
+    const [ultimaClave, ultimoValor] = ultimoElemento;
+
+    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,utlimId:ultimaClave}
     ws.broadcast(result)
   }
   else if(obj.type=="get_positions"){
@@ -131,7 +139,15 @@ ws.onMessage = async (socket, id, obj) => {
   }
   else if(obj.type=="remove_totem"){
     ws.llistaTotems.delete(obj.idTotem)
-    result={status:"OK",type:"totemEliminat",totems:Object.fromEntries(ws.llistaTotems)}
+    const arrayDeMapa = Array.from(ws.llistaTotems);
+
+    // Obtener el último elemento del array
+    const ultimoElemento = arrayDeMapa[arrayDeMapa.length - 1];
+
+    // Obtener la clave y el valor del último elemento
+    const [ultimaClave, ultimoValor] = ultimoElemento;
+
+    result={status:"OK",type:"totemEliminat",totems:Object.fromEntries(ws.llistaTotems),utlimId:ultimaClave}
     ws.broadcast(result)
   }
 }
