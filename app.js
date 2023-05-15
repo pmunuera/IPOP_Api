@@ -68,6 +68,7 @@ ws.onMessage = async (socket, id, obj) => {
   }
   else if (obj.type=="newUser"){
     var totemsUsuari = []
+    console.log(ws.socketsClients);
     if(ws.socketsClients.size==1){
         let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
@@ -107,6 +108,7 @@ ws.onMessage = async (socket, id, obj) => {
             await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+"','"+obj.cicle+"','"+ws.ip+"',1);");
         }
     })
+    console.log(ws.llistaTotems);
     result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users}
     ws.broadcast(result)
   }
