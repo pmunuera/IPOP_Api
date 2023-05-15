@@ -49,7 +49,7 @@ class Obj {
         this.ip=ws._socket.remoteAddress
         this.users = []
         this.socketsClients.set(ws, metadata)
-        
+        this.counter=0
         if(this.socketsClients.size==1){
             this.numTotems=this.numTotems+10
         }
@@ -61,7 +61,6 @@ class Obj {
         // What to do when a client is disconnected
         ws.on("close", async () => { 
             if(this.socketsClients.size==1){
-                this.numTotems=0
                 this.llistaTotems=new Map()
             }
             console.log(this.users);
