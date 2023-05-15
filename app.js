@@ -85,14 +85,12 @@ ws.onMessage = async (socket, id, obj) => {
         let nombreTotemsFalsos = totemsFalsos.map(item => {
           return{nom:item.nom,cicle:item.id_cicle}
         });
-        console.log(nombreTotemsFalsos);
         for (let i = 0; i < 5; i++){
             let num1 = Math.floor(Math.random()*nombreTotemsFalsos.length)
             let ciclesFalsosT =  await db.query("select * FROM Cicles where id="+nombreTotemsFalsos[num1].cicle+";")
             let x2 = Math.floor(Math.random()*768)
             let y2 = Math.floor(Math.random()*768)
             var totem2 = {nom: totemsFalsos[num1].nom,cicle: ciclesFalsosT[0].nom,x:x2,y:y2}
-            console.log("Totem 2: "+totem2);
             ws.llistaTotems.set(ws.llistaTotems.size,totem2)
             totemsIncorrectes.set(ws.llistaTotems.size,totem1)
         }
@@ -116,7 +114,6 @@ ws.onMessage = async (socket, id, obj) => {
             await db.query("insert into Connexions(nom,cicle,ip,connexio) values('"+obj.nom+"','"+obj.cicle+"','"+ws.ip+"',1);");
         }
     })
-    console.log(ws.llistaTotems);
     result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users}
     ws.broadcast(result)
   }
