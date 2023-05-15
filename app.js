@@ -68,7 +68,8 @@ ws.onMessage = async (socket, id, obj) => {
   }
   else if (obj.type=="newUser"){
     var totemsUsuari = []
-    console.log(ws.socketsClients);
+    var totemsCorrectes = new Map()
+    var totemsIncorrectes = new Map()
     if(ws.socketsClients.size==1){
         let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
@@ -78,6 +79,7 @@ ws.onMessage = async (socket, id, obj) => {
             let y1 = Math.floor(Math.random()*768)
             var totem1 = {nom: totemsDisponibles[num].nom,x:x1,y:y1}
             ws.llistaTotems.set(ws.llistaTotems.size,totem1)
+            totemsCorrectes.set(ws.llistaTotems.size,totem1)
         }
         let totemsFalsos = await db.query("select nom from Ocupacions where id_cicle!=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsFalsos = totemsFalsos.map(item => item.nom);
@@ -87,6 +89,7 @@ ws.onMessage = async (socket, id, obj) => {
             let y2 = Math.floor(Math.random()*768)
             var totem2 = {nom: totemsFalsos[num1].nom,x:x2,y:y2}
             ws.llistaTotems.set(ws.llistaTotems.size,totem2)
+            totemsIncorrectes.set(ws.llistaTotems.size,totem1)
         }
     }
     else{
@@ -109,7 +112,7 @@ ws.onMessage = async (socket, id, obj) => {
         }
     })
     console.log(ws.llistaTotems);
-    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users}
+    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,totemsCorrectes:totemsCorrectes,totemsIncorrectes}
     ws.broadcast(result)
   }
   else if(obj.type=="get_positions"){

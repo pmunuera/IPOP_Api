@@ -62,7 +62,7 @@ class Obj {
         ws.on("close", async () => { 
             if(this.socketsClients.size==1){
                 this.numTotems=0
-                llistaTotems=new Map()
+                this.llistaTotems=new Map()
             }
             console.log(this.users);
             var count=0
