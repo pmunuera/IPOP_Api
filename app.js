@@ -77,7 +77,7 @@ ws.onMessage = async (socket, id, obj) => {
             let num = Math.floor(Math.random()*nombreTotemsDisponibles.length)
             let x1 = Math.floor(Math.random()*768)
             let y1 = Math.floor(Math.random()*768)
-            var totem1 = {nom: totemsDisponibles[num].nom,x:x1,y:y1}
+            var totem1 = {nom: totemsDisponibles[num].nom,cicle: obj.cicle,x:x1,y:y1}
             ws.llistaTotems.set(ws.llistaTotems.size,totem1)
             totemsCorrectes.set(ws.llistaTotems.size,totem1)
         }
@@ -87,7 +87,7 @@ ws.onMessage = async (socket, id, obj) => {
             let num1 = Math.floor(Math.random()*nombreTotemsFalsos.length)
             let x2 = Math.floor(Math.random()*768)
             let y2 = Math.floor(Math.random()*768)
-            var totem2 = {nom: totemsFalsos[num1].nom,x:x2,y:y2}
+            var totem2 = {nom: totemsFalsos[num1].nom,cicle: obj.cicle,x:x2,y:y2}
             ws.llistaTotems.set(ws.llistaTotems.size,totem2)
             totemsIncorrectes.set(ws.llistaTotems.size,totem1)
         }
@@ -99,7 +99,7 @@ ws.onMessage = async (socket, id, obj) => {
             let num = Math.floor(Math.random()*nombreTotemsDisponibles.length)
             let x = Math.floor(Math.random()*768)
             let y = Math.floor(Math.random()*768)
-            var totem3 = {nom: totemsDisponibles[num].nom,x:x,y:y}
+            var totem3 = {nom: totemsDisponibles[num].nom,cicle: obj.cicle,x:x,y:y}
             ws.llistaTotems.set(ws.llistaTotems.size,totem3)
         }
     }
@@ -112,7 +112,7 @@ ws.onMessage = async (socket, id, obj) => {
         }
     })
     console.log(ws.llistaTotems);
-    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,totemsCorrectes:totemsCorrectes,totemsIncorrectes}
+    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,totemsCorrectes:totemsCorrectes,totemsIncorrectes:totemsIncorrectes}
     ws.broadcast(result)
   }
   else if(obj.type=="get_positions"){
