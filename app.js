@@ -112,7 +112,7 @@ ws.onMessage = async (socket, id, obj) => {
         }
     })
     console.log(ws.llistaTotems);
-    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users,totemsCorrectes:totemsCorrectes,totemsIncorrectes:totemsIncorrectes}
+    result={status:"OK",type:"newClient",totems:Object.fromEntries(ws.llistaTotems),users:ws.users}
     ws.broadcast(result)
   }
   else if(obj.type=="get_positions"){
