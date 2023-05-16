@@ -67,7 +67,6 @@ ws.onMessage = async (socket, id, obj) => {
     ws.private(rst)
   }
   else if (obj.type=="newUser"){
-    await wait(500)
     if(ws.socketsClients.size==1){
         let totemsDisponibles = await db.query("select nom from Ocupacions where id_cicle=(select id from Cicles where nom='"+obj.cicle+"')");
         let nombreTotemsDisponibles = totemsDisponibles.map(item => item.nom);
