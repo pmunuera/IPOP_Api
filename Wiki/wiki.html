@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="mySidenav" class="sidenav">
+      <a href="#">API</a>
+    </div>
+
+    <!-- Add all page content inside this div if you want the side nav to push page content to the right (not used if you only want the sidenav to sit on top of the page -->
+    <div id="main">
+        <h2>API</h2>
+        <h3>SET_RECORD</h3>
+        <p>Set_record és la funció de la API que insertarà les dades de la partida que acabem de fer, calculant la seva puntuació</p>
+        <p>Aquesta funció rep els paràmetres alies,cicle,temps,encerts,errades. En primer lloc la funció comprova que el nom del cicle que em passat existeix, després d'això agafa la id del cicle en concret. 
+          Seguidament calcula la puntuació amb el nostre algorisme, aquest algoritme té un temps límit, si aquest temps límit no es sobrepassa 
+          es es restarà d'aquest temps límit el nostre temps, això es sumarà a 150 i es multiplicarà per els nostres encerts
+          , a aquest número li restarem el nostrem numero d'errades multiplicat pel nostre temps entre 4. Si em sobrepassat el temps, multiplicarem
+          el nostre numer d'encerts per 150 i restarem les nostres errades multiplicades pel temps limit entre 4 (que es 150)
+          si resulta que la puntuació es negativa la deixarem en 0. Un cop calculada la puntuació, inserim les dades a la base de dades i enviem un missatge duent que tot està bé.
+        </p>
+        <h3>GET_RANKING</h3>
+        <p>Amb la funció get_ranking, fem una consulta a la base de dades per a obtenir les partides amb més puntuació,
+          a la funció pasarem en quina posició volem començar y cuantes posicions a partir d'aquesta agafarà.
+          De forma que pasarà les dades a partir d'aquesta posició fins a la que nosaltres pedim. A la funció em posat un límit per a què
+          no pugui superar les 20 posicions la demanda a la funció.
+        </p>
+        <h2>Base de dades</h2>
+        <p>La base de dades actual consta de quatre taules:</p>
+        <h3>Taula Families_Professionals</h3>
+        <p>La taula Families_Professionals conté els següents camps:</p>
+        <ul>
+          <li><strong>id: </strong>La identificació de la família professional.</li>
+          <li><strong>nom: </strong>El nom de la família professional.</li>
+        </ul>
+        <h3>Taula Cicles</h3>
+        <p>La taula Cicles conté els següents camps:</p>
+        <ul>
+          <li><strong>id: </strong>La identificació del cicle.</li>
+          <li><strong>nom: </strong>El nom del cicle.</li>
+          <li><strong>id_familia_professional: </strong>La identificació de la família professional a la qual correspon el cicle.</li>
+        </ul>
+        <h3>Taula Ocupacions</h3>
+        <p>La taula Ocupacions conté els següents camps:</p>
+        <ul>
+          <li><strong>id: </strong>La identificació de l'ocupació.</li>
+          <li><strong>nom: </strong>El nom de l'ocupació.</li>
+          <li><strong>id_cicle: </strong>La identificació del cicle al qual correspon l'ocupació.</li>
+        </ul>
+        <h3>Taula Ranking</h3>
+        <p>La taula Ranking  conté els següents camps:</p>
+        <ul>
+          <li><strong>id: </strong>La identificació del record.</li>
+          <li><strong>alies: </strong>Nom del jugador que té el record.</li>
+          <li><strong>cicle: </strong>Identificació del cicle al qual pertany el jugador que ha fet el record.</li>
+          <li><strong>puntuacio: </strong>La puntuació que ha obtingut el jugador.</li>
+          <li><strong>temps: </strong>El temps que ha trigat el jugador a arribar als tòtems necessaris per acabar.</li>
+          <li><strong>encerts: </strong>Número de tòtems agafats que pertanyen a la seva família professional.</li>
+          <li><strong>errades: </strong>Número de tòtems agafats que NO pertanyen a la seva família professional.</li>
+          <li><strong>visible: </strong>Indicarà si el record es podrà veure al ranking.</li>
+          <li><strong>ip_jugador: </strong>És la ip del jugador.</li>
+          <li><strong>dispositiu: </strong>El nombre del dispositiu que ha utilitzat el jugador.</li>
+        </ul>
+        <h3>Taula Connexions</h3>
+        <p>La taula Connexions conté els següents camps:</p>
+        <ul>
+          <li><strong>id: </strong>La identificació de la connexió.</li>
+          <li><strong>nom: </strong>El nom de la persona que ha fet una connexió o desconnexió.</li>
+          <li><strong>cicle: </strong>El nom del cicle que és el jugador.</li>
+          <li><strong>ip: </strong>La ip des d'on s'ha produït la connexió/desconnexió.</li>
+          <li><strong>connexio: </strong>És un camp on ens indica si aquesta dada guardada és d'una connexió o desconnexió.</li>
+        </ul>
+        <img src="assets/Imgs/IPOP_BD.jpg">
+    </div>
+  </body>
+</html>
